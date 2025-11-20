@@ -265,6 +265,5 @@ const TradeChart = observer(() => {
             </SmartChart>
         </>
     );
-    // [/AI]
 });
 export default TradeChart;
