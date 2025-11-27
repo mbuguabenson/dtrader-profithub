@@ -7,7 +7,7 @@ import { useStore } from '@deriv/stores';
 import { Localize, useTranslations } from '@deriv-com/translations';
 
 type AccountHeaderProps = {
-    balance?: string;
+    balance?: string | number;
     currency?: string;
     is_logged_in?: boolean;
     is_virtual?: boolean;
@@ -29,11 +29,12 @@ const AccountHeader = observer(
         const is_logged_in = isLoggedInProp ?? client.is_logged_in;
         const is_virtual = isVirtualProp ?? client.is_virtual;
 
-        // Check if balance is a valid number (handles comma-formatted strings like "10,000.00")
+        // Check if balance is a valid number (handles comma-formatted strings like "10,000.00" and numeric 0)
         const isValidBalance =
             balance !== undefined &&
             balance !== null &&
             balance !== '' &&
+            // (typeof balance === 'number' || !isNaN(Number(String(balance).replace(/,/g, ''))));
             !isNaN(Number(String(balance).replace(/,/g, '')));
 
         const currency_lower = currency?.toLowerCase();
@@ -77,7 +78,7 @@ const AccountHeader = observer(
                                 ) : isValidBalance ? (
                                     `${addComma(balance, 2)} ${getCurrencyDisplayCode(currency)}`
                                 ) : (
-                                    `- ${getCurrencyDisplayCode(currency)}`
+                                    `0.00 ${getCurrencyDisplayCode(currency)}`
                                 )}
                             </p>
                         </div>

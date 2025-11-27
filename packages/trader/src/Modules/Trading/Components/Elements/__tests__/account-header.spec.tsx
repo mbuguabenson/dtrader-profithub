@@ -124,7 +124,7 @@ describe('AccountHeader', () => {
 
                 renderComponent(nan_balance_store);
 
-                expect(screen.getByText('- USD')).toBeInTheDocument();
+                expect(screen.getByText('0.00 USD')).toBeInTheDocument();
                 expect(screen.queryByText('NaN USD')).not.toBeInTheDocument();
             });
 
@@ -141,7 +141,7 @@ describe('AccountHeader', () => {
 
                 renderComponent(null_balance_store);
 
-                expect(screen.getByText('- EUR')).toBeInTheDocument();
+                expect(screen.getByText('0.00 EUR')).toBeInTheDocument();
             });
 
             it('should display dash with currency when balance is undefined', () => {
@@ -157,7 +157,7 @@ describe('AccountHeader', () => {
 
                 renderComponent(undefined_balance_store);
 
-                expect(screen.getByText('- GBP')).toBeInTheDocument();
+                expect(screen.getByText('0.00 GBP')).toBeInTheDocument();
             });
 
             it('should display dash with currency when balance is empty string', () => {
@@ -173,7 +173,7 @@ describe('AccountHeader', () => {
 
                 renderComponent(empty_balance_store);
 
-                expect(screen.getByText('- AUD')).toBeInTheDocument();
+                expect(screen.getByText('0.00 AUD')).toBeInTheDocument();
             });
 
             it('should display dash with currency when balance is invalid string', () => {
@@ -189,7 +189,7 @@ describe('AccountHeader', () => {
 
                 renderComponent(invalid_balance_store);
 
-                expect(screen.getByText('- CAD')).toBeInTheDocument();
+                expect(screen.getByText('0.00 CAD')).toBeInTheDocument();
                 expect(screen.queryByText('invalid CAD')).not.toBeInTheDocument();
             });
 
@@ -202,6 +202,18 @@ describe('AccountHeader', () => {
                 });
 
                 expect(screen.getByText('1,000.50 USD')).toBeInTheDocument();
+            });
+
+            it('should display numeric 0 balance correctly as 0.00', () => {
+                renderComponent(default_mock_store, {
+                    balance: 0,
+                    currency: 'USD',
+                    is_logged_in: true,
+                    is_virtual: false,
+                });
+
+                expect(screen.getByText('0.00 USD')).toBeInTheDocument();
+                expect(screen.queryByText('0.00 USD')).toBeInTheDocument();
             });
 
             it('should display balance correctly when balance is comma-formatted string', () => {
@@ -234,7 +246,7 @@ describe('AccountHeader', () => {
                 renderComponent(no_currency_invalid_balance_store);
 
                 expect(screen.getByText('No currency assigned')).toBeInTheDocument();
-                expect(screen.queryByText('- ')).not.toBeInTheDocument();
+                expect(screen.queryByText(/^- $/)).not.toBeInTheDocument();
             });
 
             it('should handle zero balance correctly', () => {
