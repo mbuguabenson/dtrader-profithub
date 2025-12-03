@@ -7,11 +7,13 @@ import { Localize } from '@deriv-com/translations';
 
 import { useTraderStore } from 'Stores/useTraderStores';
 
-import { InputPopover, ValueChips } from '../../InputPopover';
+import { InputPopover, ValueChips, TabSelector } from '../../InputPopover';
 
 import DurationUnitSelector from './duration-unit-selector';
+import DurationInputDesktop from './duration-input-desktop';
 
 const DURATION_TICK_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const DURATION_SECONDS_VALUES = [15, 20, 25, 30, 35, 40, 45, 50, 55, 60];
 
 interface DurationDesktopProps {
     is_minimized?: boolean;
@@ -23,46 +25,61 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
     const [isPopoverOpen, setIsPopoverOpen] = useState(false);
     const [selectedUnit, setSelectedUnit] = useState('t'); // Default to Ticks
     const [selectedDuration, setSelectedDuration] = useState(duration);
+    const [activeTab, setActiveTab] = useState<'chips' | 'input'>('chips');
     const inputRef = useRef<HTMLDivElement>(null);
 
     const handleOpenPopover = useCallback(() => {
         setIsPopoverOpen(true);
-        setSelectedUnit(duration_unit === 't' ? 't' : 't'); // Always default to ticks for now
+        setSelectedUnit(duration_unit === 's' ? 's' : 't'); // Default to current unit or ticks
         setSelectedDuration(duration);
+        setActiveTab('chips'); // Always start with chips tab
     }, [duration, duration_unit]);
 
     const handleClosePopover = useCallback(() => {
         setIsPopoverOpen(false);
+        setActiveTab('chips'); // Reset to chips tab on close
     }, []);
 
     const handleUnitSelect = useCallback((unit: string) => {
         setSelectedUnit(unit);
+        setActiveTab('chips'); // Reset to chips tab when changing units
+    }, []);
+
+    const handleTabChange = useCallback((tab: 'chips' | 'input') => {
+        setActiveTab(tab);
     }, []);
 
     const handleDurationSelect = useCallback(
         (value: number) => {
             setSelectedDuration(value);
-            // Apply the change immediately
+            // Apply the change immediately based on selected unit
             onChangeMultiple({
-                duration_unit: 't',
+                duration_unit: selectedUnit,
                 duration: value,
                 expiry_type: 'duration',
             });
             handleClosePopover();
         },
-        [onChangeMultiple, handleClosePopover]
+        [selectedUnit, onChangeMultiple, handleClosePopover]
     );
 
     const formatTickValue = useCallback((value: number) => {
         return `${value} ${value === 1 ? 'tick' : 'ticks'}`;
     }, []);
 
+    const formatSecondsValue = useCallback((value: number) => {
+        return `${value} ${value === 1 ? 'second' : 'seconds'}`;
+    }, []);
+
     const getDisplayValue = useCallback(() => {
         if (duration_unit === 't') {
             return formatTickValue(duration);
         }
+        if (duration_unit === 's') {
+            return formatSecondsValue(duration);
+        }
         return `${duration} ${duration_unit}`;
-    }, [duration, duration_unit, formatTickValue]);
+    }, [duration, duration_unit, formatTickValue, formatSecondsValue]);
 
     return (
         <>
@@ -92,6 +109,11 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
                         <DurationUnitSelector selectedUnit={selectedUnit} onSelectUnit={handleUnitSelect} />
                     </div>
                     <div className='duration-popover__main'>
+                        {selectedUnit === 's' && (
+                            <div className='duration-popover__header'>
+                                <TabSelector activeTab={activeTab} onTabChange={handleTabChange} />
+                            </div>
+                        )}
                         <div className='duration-popover__content'>
                             {selectedUnit === 't' ? (
                                 <ValueChips
@@ -100,6 +122,17 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
                                     onSelect={handleDurationSelect}
                                     formatValue={formatTickValue}
                                 />
+                            ) : selectedUnit === 's' ? (
+                                activeTab === 'chips' ? (
+                                    <ValueChips
+                                        values={DURATION_SECONDS_VALUES}
+                                        selectedValue={selectedDuration}
+                                        onSelect={handleDurationSelect}
+                                        formatValue={formatSecondsValue}
+                                    />
+                                ) : (
+                                    <DurationInputDesktop onClose={handleClosePopover} />
+                                )
                             ) : (
                                 <div className='duration-popover__coming-soon'>
                                     <Text size='md' color='quill-typography-default'>

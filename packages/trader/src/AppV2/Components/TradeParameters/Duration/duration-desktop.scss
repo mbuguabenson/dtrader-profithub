@@ -28,6 +28,12 @@
         min-width: 0;
     }
 
+    &__header {
+        padding: var(--core-spacing-800);
+        padding-bottom: var(--core-spacing-400);
+        border-bottom: 0.1rem solid var(--component-divider-default);
+    }
+
     &__content {
         flex: 1;
         padding: var(--core-spacing-800);
@@ -40,5 +46,23 @@
         justify-content: center;
         height: 100%;
         color: var(--component-textIcon-normal-subtle);
+    }
+}
+
+.duration-input-desktop {
+    &__wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: space-between;
+    }
+
+    &__footer {
+        margin-top: auto;
+        padding-top: var(--core-spacing-800);
+    }
+
+    &__save-button {
+        width: 100%;
     }
 }

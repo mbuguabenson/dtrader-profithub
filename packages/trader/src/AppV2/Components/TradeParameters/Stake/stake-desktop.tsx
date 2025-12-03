@@ -2,12 +2,11 @@ import React from 'react';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 
-import { LabelPairedKeyboardCaptionBoldIcon } from '@deriv/quill-icons';
 import { getCurrencyDisplayCode } from '@deriv/shared';
-import { SegmentedControlSingleChoice, TextField } from '@deriv-com/quill-ui';
+import { TextField } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
 
-import { InputPopover, ValueChips } from 'AppV2/Components/InputPopover';
+import { InputPopover, ValueChips, TabSelector } from 'AppV2/Components/InputPopover';
 import useTradeError from 'AppV2/Hooks/useTradeError';
 import { getDisplayedContractTypes } from 'AppV2/Utils/trade-types-utils';
 import { useTraderStore } from 'Stores/useTraderStores';
@@ -47,19 +46,8 @@ const Stake = observer(({ is_minimized }: TTradeParametersProps) => {
         setIsOpen(true);
     }, []);
 
-    const LightningIcon = () => (
-        <svg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-            <path d='M13 2L3 14h8l-1 8 10-12h-8l1-8z' fill='currentColor' />
-        </svg>
-    );
-
-    const tab_options = [
-        { label: <LightningIcon />, value: 'chips' },
-        { label: <LabelPairedKeyboardCaptionBoldIcon />, value: 'input' },
-    ];
-
-    const handleTabChange = (index: number) => {
-        setActiveTab(index === 0 ? 'chips' : 'input');
+    const handleTabChange = (tab: 'chips' | 'input') => {
+        setActiveTab(tab);
     };
 
     const onClose = React.useCallback(() => {
@@ -92,13 +80,7 @@ const Stake = observer(({ is_minimized }: TTradeParametersProps) => {
             </div>
             <InputPopover isOpen={is_open} onClose={onClose} triggerRef={stake_field_ref} className='stake-popover'>
                 <div className='stake-popover__header'>
-                    <SegmentedControlSingleChoice
-                        hasContainerWidth
-                        onChange={handleTabChange}
-                        options={tab_options}
-                        selectedItemIndex={active_tab === 'chips' ? 0 : 1}
-                        size='sm'
-                    />
+                    <TabSelector activeTab={active_tab} onTabChange={handleTabChange} />
                 </div>
                 <div className='stake-popover__content'>
                     {active_tab === 'chips' ? (
