@@ -14,6 +14,7 @@ import DurationInputDesktop from './duration-input-desktop';
 
 const DURATION_TICK_VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const DURATION_SECONDS_VALUES = [15, 20, 25, 30, 35, 40, 45, 50, 55, 60];
+const DURATION_MINUTES_VALUES = [1, 2, 3, 4, 5, 10, 15, 30, 45, 60];
 
 interface DurationDesktopProps {
     is_minimized?: boolean;
@@ -30,7 +31,7 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
 
     const handleOpenPopover = useCallback(() => {
         setIsPopoverOpen(true);
-        setSelectedUnit(duration_unit === 's' ? 's' : 't'); // Default to current unit or ticks
+        setSelectedUnit(duration_unit === 's' ? 's' : duration_unit === 'm' ? 'm' : 't'); // Default to current unit or ticks
         setSelectedDuration(duration);
         setActiveTab('chips'); // Always start with chips tab
     }, [duration, duration_unit]);
@@ -71,6 +72,10 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
         return `${value} ${value === 1 ? 'second' : 'seconds'}`;
     }, []);
 
+    const formatMinutesValue = useCallback((value: number) => {
+        return `${value} ${value === 1 ? 'minute' : 'minutes'}`;
+    }, []);
+
     const getDisplayValue = useCallback(() => {
         if (duration_unit === 't') {
             return formatTickValue(duration);
@@ -78,8 +83,11 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
         if (duration_unit === 's') {
             return formatSecondsValue(duration);
         }
+        if (duration_unit === 'm') {
+            return formatMinutesValue(duration);
+        }
         return `${duration} ${duration_unit}`;
-    }, [duration, duration_unit, formatTickValue, formatSecondsValue]);
+    }, [duration, duration_unit, formatTickValue, formatSecondsValue, formatMinutesValue]);
 
     return (
         <>
@@ -109,7 +117,7 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
                         <DurationUnitSelector selectedUnit={selectedUnit} onSelectUnit={handleUnitSelect} />
                     </div>
                     <div className='duration-popover__main'>
-                        {selectedUnit === 's' && (
+                        {(selectedUnit === 's' || selectedUnit === 'm') && (
                             <div className='duration-popover__header'>
                                 <TabSelector activeTab={activeTab} onTabChange={handleTabChange} />
                             </div>
@@ -131,7 +139,18 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
                                         formatValue={formatSecondsValue}
                                     />
                                 ) : (
-                                    <DurationInputDesktop onClose={handleClosePopover} />
+                                    <DurationInputDesktop unit='s' onClose={handleClosePopover} />
+                                )
+                            ) : selectedUnit === 'm' ? (
+                                activeTab === 'chips' ? (
+                                    <ValueChips
+                                        values={DURATION_MINUTES_VALUES}
+                                        selectedValue={selectedDuration}
+                                        onSelect={handleDurationSelect}
+                                        formatValue={formatMinutesValue}
+                                    />
+                                ) : (
+                                    <DurationInputDesktop unit='m' onClose={handleClosePopover} />
                                 )
                             ) : (
                                 <div className='duration-popover__coming-soon'>

@@ -7,17 +7,20 @@ import { Localize, useTranslations } from '@deriv-com/translations';
 import { useTraderStore } from 'Stores/useTraderStores';
 
 type TDurationInputDesktopProps = {
+    unit: 's' | 'm';
     onClose: () => void;
 };
 
 const MIN_SECONDS = 15;
 const MAX_SECONDS = 60;
+const MIN_MINUTES = 1;
+const MAX_MINUTES = 60;
 
-const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ onClose }) => {
+const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ unit, onClose }) => {
     const { localize } = useTranslations();
     const { duration, duration_unit, onChangeMultiple } = useTraderStore();
 
-    const [inputValue, setInputValue] = useState<string>(duration_unit === 's' ? String(duration) : '');
+    const [inputValue, setInputValue] = useState<string>(duration_unit === unit ? String(duration) : '');
     const [error, setError] = useState<string>('');
 
     const validateInput = useCallback(
@@ -33,11 +36,16 @@ const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ o
                 return false;
             }
 
-            if (numValue < MIN_SECONDS || numValue > MAX_SECONDS) {
+            const min = unit === 's' ? MIN_SECONDS : MIN_MINUTES;
+            const max = unit === 's' ? MAX_SECONDS : MAX_MINUTES;
+            const unitLabel = unit === 's' ? 'seconds' : 'minutes';
+
+            if (numValue < min || numValue > max) {
                 setError(
-                    localize('Please enter a duration between {{min}} to {{max}} seconds.', {
-                        min: MIN_SECONDS,
-                        max: MAX_SECONDS,
+                    localize('Please enter a duration between {{min}} to {{max}} {{unit}}.', {
+                        min,
+                        max,
+                        unit: unitLabel,
                     })
                 );
                 return false;
@@ -46,7 +54,7 @@ const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ o
             setError('');
             return true;
         },
-        [localize]
+        [localize, unit]
     );
 
     const handleInputChange = useCallback(
@@ -74,34 +82,41 @@ const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ o
         }
 
         onChangeMultiple({
-            duration_unit: 's',
+            duration_unit: unit,
             duration: Number(inputValue),
             expiry_type: 'duration',
         });
         onClose();
     }, [inputValue, validateInput, onChangeMultiple, onClose]);
 
-    const getRangeMessage = () => (
-        <Localize
-            i18n_default_text='Range: {{min}} - {{max}} seconds'
-            values={{
-                min: MIN_SECONDS,
-                max: MAX_SECONDS,
-            }}
-        />
-    );
+    const getRangeMessage = () => {
+        const min = unit === 's' ? MIN_SECONDS : MIN_MINUTES;
+        const max = unit === 's' ? MAX_SECONDS : MAX_MINUTES;
+        const unitLabel = unit === 's' ? 'seconds' : 'minutes';
+
+        return (
+            <Localize
+                i18n_default_text='Range: {{min}} - {{max}} {{unit}}'
+                values={{
+                    min,
+                    max,
+                    unit: unitLabel,
+                }}
+            />
+        );
+    };
 
     return (
         <div className='duration-input-desktop__wrapper'>
             <TextField
-                label={localize('Seconds')}
+                label={localize(unit === 's' ? 'Seconds' : 'Minutes')}
                 name='duration'
                 value={inputValue}
                 onChange={handleInputChange}
-                placeholder={localize('Seconds')}
+                placeholder={localize(unit === 's' ? 'Seconds' : 'Minutes')}
                 variant='outline'
                 inputMode='numeric'
-                maxLength={2}
+                maxLength={unit === 's' ? 2 : 3}
                 message={error || getRangeMessage()}
                 status={error ? 'error' : 'neutral'}
                 noStatusIcon
