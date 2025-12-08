@@ -193,7 +193,7 @@ const DurationHoursInputDesktop: React.FC<DurationHoursInputDesktopProps> = obse
                     </div>
                 )}
                 <div className='duration-input-desktop__footer'>
-                    <Button size='lg' fullWidth onClick={handleSave}>
+                    <Button size='lg' fullWidth onClick={handleSave} color='black-white'>
                         <Localize i18n_default_text='Save' />
                     </Button>
                 </div>
