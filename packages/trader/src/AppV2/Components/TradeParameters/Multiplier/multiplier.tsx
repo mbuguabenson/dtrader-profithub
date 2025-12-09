@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 
 import { ActionSheet, Skeleton, TextField } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
+import { isMobile } from '@deriv/shared';
 
 import Carousel from 'AppV2/Components/Carousel';
 import CarouselHeader from 'AppV2/Components/Carousel/carousel-header';
@@ -19,11 +20,10 @@ import MultiplierWheelPicker from './multiplier-wheel-picker';
 import './multiplier-desktop.scss';
 
 const Multiplier = observer(({ is_minimized }: TTradeParametersProps) => {
-    const { multiplier, multiplier_range_list, commission, is_market_closed, onChange, currency, root_store } =
-        useTraderStore();
+    const { multiplier, multiplier_range_list, commission, is_market_closed, onChange, currency } = useTraderStore();
 
     const [isOpen, setIsOpen] = useState(false);
-    const is_mobile = root_store?.ui?.is_mobile;
+    const is_mobile = isMobile();
     const is_small_screen_device = isSmallScreen();
     const classname = clsx('trade-params__option', is_minimized && 'trade-params__option--minimized');
 

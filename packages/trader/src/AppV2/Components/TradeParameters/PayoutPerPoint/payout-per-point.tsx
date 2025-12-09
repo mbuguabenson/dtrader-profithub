@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 
 import { Skeleton } from '@deriv/components';
-import { getCurrencyDisplayCode } from '@deriv/shared';
+import { getCurrencyDisplayCode, isMobile } from '@deriv/shared';
 import { ActionSheet, TextField } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
 
@@ -22,9 +22,9 @@ import './payout-per-point-desktop.scss';
 
 const PayoutPerPoint = observer(({ is_minimized }: TTradeParametersProps) => {
     const [is_open, setIsOpen] = React.useState(false);
-    const { barrier_1, currency, is_market_closed, payout_choices, payout_per_point, root_store, setPayoutPerPoint } =
+    const { barrier_1, currency, is_market_closed, payout_choices, payout_per_point, setPayoutPerPoint } =
         useTraderStore();
-    const is_mobile = root_store?.ui?.is_mobile;
+    const is_mobile = isMobile();
     const is_small_screen = isSmallScreen();
     const currency_display_code = getCurrencyDisplayCode(currency);
     const payout_per_point_list = [...payout_choices]
