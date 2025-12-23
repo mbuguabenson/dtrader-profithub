@@ -222,7 +222,7 @@ const DayInput = ({
                 onClick={() => {
                     setOpen(true);
                 }}
-                leftIcon={<LabelPairedCalendarSmRegularIcon width={24} height={24} />}
+                leftIcon={<LabelPairedCalendarSmRegularIcon width={24} height={24} fill='var(--color-text-primary)' />}
             />
 
             <TextField
@@ -235,7 +235,9 @@ const DayInput = ({
                 onClick={() => {
                     setOpenTimePicker(true);
                 }}
-                leftIcon={<LabelPairedClockThreeSmRegularIcon width={24} height={24} />}
+                leftIcon={
+                    <LabelPairedClockThreeSmRegularIcon width={24} height={24} fill='var(--color-text-primary)' />
+                }
             />
 
             <div className='duration-container__days-input__expiry'>
