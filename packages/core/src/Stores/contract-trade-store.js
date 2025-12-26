@@ -70,6 +70,7 @@ export default class ContractTradeStore extends BaseStore {
             filtered_contracts: computed,
             addContract: action.bound,
             removeContract: action.bound,
+            clearContracts: action.bound,
             onUnmount: override,
             prev_chart_type: observable,
             prev_granularity: observable,
@@ -451,6 +452,17 @@ export default class ContractTradeStore extends BaseStore {
     removeContract({ contract_id }) {
         this.contracts = this.contracts.filter(c => c.contract_id !== contract_id);
         delete this.contracts_map[contract_id];
+    }
+
+    /**
+     * Clear all contracts and related data
+     * Called when switching accounts to prevent showing markers from previous account
+     */
+    clearContracts() {
+        this.contracts = [];
+        this.contracts_map = {};
+        this.clearAccumulatorBarriersData(false, true);
+        this.clearLastContractOverride();
     }
 
     setBarriersLoadingState(is_loading) {

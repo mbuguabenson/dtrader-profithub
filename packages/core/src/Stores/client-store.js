@@ -649,6 +649,11 @@ export default class ClientStore extends BaseStore {
         this.root_store.notifications.removeTradeNotifications();
         this.root_store.notifications.removeAllNotificationMessages(true);
 
+        // Clear contract markers to prevent showing previous account's contracts on chart
+        if (this.root_store.contract_trade) {
+            this.root_store.contract_trade.clearContracts();
+        }
+
         // Reconnect WebSocket with new account
         BinarySocket.closeAndOpenNewConnection();
     }
