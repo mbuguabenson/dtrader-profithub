@@ -76,6 +76,7 @@ export { default as ToggleSwitch } from './components/toggle-switch';
 export { default as TickPicker } from './components/tick-picker';
 export { default as TickProgress } from './components/tick-progress';
 export { default as Tooltip } from './components/tooltip';
+export { default as TooltipPortal } from './components/tooltip-portal';
 export { default as UILoader } from './components/u-i-loader';
 export { default as UnhandledErrorModal } from './components/unhandled-error-modal';
 export { default as VerticalTab } from './components/vertical-tab';

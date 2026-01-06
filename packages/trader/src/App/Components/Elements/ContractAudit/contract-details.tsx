@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { Money, Text, ThemedScrollbars } from '@deriv/components';
+import { Button, MobileDialog, Money, Text, ThemedScrollbars } from '@deriv/components';
 import {
     IllustrativePayoutIcon,
     LegacyBarrierIcon,
@@ -24,6 +24,7 @@ import {
     formatResetDuration,
     getCancellationPrice,
     getCurrencyDisplayCode,
+    getEntrySpotTooltipMessage,
     getLocalizedBasis,
     hasTwoBarriers,
     isAccumulatorContract,
@@ -37,6 +38,7 @@ import {
     isTurbosContract,
     isUserCancelled,
     isUserSold,
+    isVanillaContract,
     isVanillaFxContract,
     TContractInfo,
     toGMTFormat,
@@ -93,10 +95,8 @@ const ContractDetails = ({
     } = contract_info;
     const { isMobile } = useDevice();
     const { localize } = useTranslations();
-
-    const actual_entry_spot = entry_spot;
-    const actual_exit_spot = exit_spot_value;
-    const actual_exit_spot_display_value = exit_spot_value;
+    const [showEntrySpotDialog, setShowEntrySpotDialog] = React.useState<boolean>(false);
+    const entry_spot_tooltip = getEntrySpotTooltipMessage(contract_type);
 
     const is_profit = Number(profit) >= 0;
     const cancellation_price = getCancellationPrice(contract_info);
@@ -218,7 +218,7 @@ const ContractDetails = ({
                                     label={getBarrierLabel(contract_info)}
                                     value={
                                         (isResetContract(contract_type)
-                                            ? addComma(actual_entry_spot?.toString() || '')
+                                            ? addComma(entry_spot?.toString() || '')
                                             : getBarrierValue(contract_info)) || ' - '
                                     }
                                 />
@@ -346,19 +346,46 @@ const ContractDetails = ({
                     </React.Fragment>
                 )}
                 {!isDigitType(contract_type) && (
-                    <ContractAuditItem
-                        id='dt_entry_spot_label'
-                        icon={<LegacyEntrySpotIcon iconSize='xs' fill='var(--color-text-primary)' />}
-                        label={localize('Entry spot')}
-                        value={actual_entry_spot ? addComma(actual_entry_spot.toString()) : ' - '}
-                        value2={entry_spot_time ? toGMTFormat(epochToMoment(entry_spot_time)) : ' - '}
-                        additional_info={
-                            isTicksContract(contract_type) &&
-                            localize('The entry spot is the first tick for High/Low Ticks.')
-                        }
-                    />
+                    <React.Fragment>
+                        <ContractAuditItem
+                            id='dt_entry_spot_label'
+                            icon={<LegacyEntrySpotIcon iconSize='xs' fill='var(--color-text-primary)' />}
+                            label={localize('Entry spot')}
+                            value={entry_spot ? addComma(entry_spot.toString()) : ' - '}
+                            value2={entry_spot_time ? toGMTFormat(epochToMoment(entry_spot_time)) : ' - '}
+                            additional_info={
+                                isTicksContract(contract_type) &&
+                                localize('The entry spot is the first tick for High/Low Ticks.')
+                            }
+                            tooltip_message={entry_spot_tooltip}
+                            onLabelClick={() => setShowEntrySpotDialog(true)}
+                        />
+                        {isMobile && entry_spot_tooltip && (
+                            <MobileDialog
+                                portal_element_id='modal_root'
+                                visible={showEntrySpotDialog}
+                                onClose={() => setShowEntrySpotDialog(false)}
+                                has_full_height={false}
+                                title={localize('Entry spot')}
+                            >
+                                <div className='contract-audit__entry-spot-dialog'>
+                                    <Text size='s' className='contract-audit__entry-spot-dialog-text'>
+                                        {entry_spot_tooltip}
+                                    </Text>
+                                    <Button
+                                        className='contract-audit__entry-spot-dialog-button'
+                                        onClick={() => setShowEntrySpotDialog(false)}
+                                        has_effect
+                                        text={localize('Got it')}
+                                        primary
+                                        large
+                                    />
+                                </div>
+                            </MobileDialog>
+                        )}
+                    </React.Fragment>
                 )}
-                {(!isNaN(Number(exit_spot)) || actual_exit_spot_display_value || actual_exit_spot) && (
+                {(!isNaN(Number(exit_spot)) || exit_spot_value) && (
                     <ContractAuditItem
                         id='dt_exit_spot_label'
                         icon={<LegacyExitSpotIcon iconSize='xs' fill='var(--color-text-primary)' />}
@@ -366,11 +393,9 @@ const ContractDetails = ({
                         value={
                             exit_spot
                                 ? addComma(exit_spot)
-                                : actual_exit_spot_display_value
-                                  ? addComma(actual_exit_spot_display_value)
-                                  : actual_exit_spot
-                                    ? addComma(actual_exit_spot.toString())
-                                    : ' - '
+                                : exit_spot_value
+                                  ? addComma(exit_spot_value.toString())
+                                  : ' - '
                         }
                         value2={toGMTFormat(epochToMoment(Number(exit_spot_time))) || ' - '}
                     />

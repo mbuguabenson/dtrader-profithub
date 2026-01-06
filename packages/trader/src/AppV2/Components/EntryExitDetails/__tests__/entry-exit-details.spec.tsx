@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { CONTRACT_TYPES, mockContractInfo, TContractInfo } from '@deriv/shared';
 import { render, screen } from '@testing-library/react';
 
@@ -84,6 +82,40 @@ describe('EntryExitDetails component', () => {
 
             const entrySpotElements = screen.queryAllByText('100');
             expect(entrySpotElements).toHaveLength(0);
+        });
+    });
+
+    describe('Higher/Lower contracts', () => {
+        it('renders entry spot for HIGHER contract type', () => {
+            const higher_contract_info: TContractInfo = mockContractInfo({
+                entry_spot_time: 1622505600,
+                entry_spot: '100',
+                exit_spot_time: 1623441400,
+                exit_spot: '150',
+                date_start: 1622505600,
+                contract_type: CONTRACT_TYPES.HIGHER,
+            });
+
+            render(<EntryExitDetails contract_info={higher_contract_info} />);
+
+            expect(screen.getByText('Entry spot')).toBeInTheDocument();
+            expect(screen.getByText('100')).toBeInTheDocument();
+        });
+
+        it('renders entry spot for LOWER contract type', () => {
+            const lower_contract_info: TContractInfo = mockContractInfo({
+                entry_spot_time: 1622505600,
+                entry_spot: '100',
+                exit_spot_time: 1623441400,
+                exit_spot: '150',
+                date_start: 1622505600,
+                contract_type: CONTRACT_TYPES.LOWER,
+            });
+
+            render(<EntryExitDetails contract_info={lower_contract_info} />);
+
+            expect(screen.getByText('Entry spot')).toBeInTheDocument();
+            expect(screen.getByText('100')).toBeInTheDocument();
         });
     });
 });
