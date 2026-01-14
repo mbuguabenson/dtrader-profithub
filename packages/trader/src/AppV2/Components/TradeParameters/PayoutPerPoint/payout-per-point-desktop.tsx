@@ -71,7 +71,7 @@ const PayoutPerPointDesktop = observer(({ is_minimized }: TTradeParametersProps)
 
     return (
         <TradeParameterPopover
-            popoverWidth={178}
+            popoverWidth={154}
             label={
                 <Localize
                     i18n_default_text='Payout per point'

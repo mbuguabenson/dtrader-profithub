@@ -18,7 +18,7 @@ import { TTradeParametersProps } from '../trade-parameters';
 
 import StakeInputDesktop from './stake-input-desktop';
 
-const STAKE_CHIP_VALUES = [1, 5, 10, 15, 20, 25, 30, 40, 50, 100];
+const STAKE_CHIP_VALUES = [1, 5, 10, 15, 20, 25];
 
 const StakePopoverContent: React.FC<{
     active_tab: 'chips' | 'input';
@@ -97,6 +97,7 @@ const Stake = observer(({ is_minimized }: TTradeParametersProps) => {
             disabled={has_open_accu_contract || is_market_closed}
             has_error={has_error && should_show_snackbar}
             popover_classname='stake-popover'
+            popoverWidth={240}
             header={<TabSelector activeTab={active_tab} onTabChange={handleTabChange} />}
             onOpen={() => setIsOpen(true)}
             onClose={onClose}
