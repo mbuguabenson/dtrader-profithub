@@ -4,8 +4,12 @@ import { observer } from 'mobx-react-lite';
 import { getCurrencyDisplayCode } from '@deriv/shared';
 import { Localize } from '@deriv-com/translations';
 
-import { TabSelector, ValueChips } from 'AppV2/Components/InputPopover';
-import { TradeParameterPopover, useTradeParameterPopover } from 'AppV2/Components/TradeParameters/Shared';
+import { TabSelector } from 'AppV2/Components/InputPopover';
+import {
+    ChipsWithInputToggle,
+    TradeParameterPopover,
+    useTradeParameterPopover,
+} from 'AppV2/Components/TradeParameters/Shared';
 import useTradeError from 'AppV2/Hooks/useTradeError';
 import { getDisplayedContractTypes } from 'AppV2/Utils/trade-types-utils';
 import { useTraderStore } from 'Stores/useTraderStores';
@@ -33,15 +37,15 @@ const StakePopoverContent: React.FC<{
         [onChipSelect, closePopover]
     );
 
-    return active_tab === 'chips' ? (
-        <ValueChips
-            values={STAKE_CHIP_VALUES}
+    return (
+        <ChipsWithInputToggle
+            activeTab={active_tab}
+            chipValues={STAKE_CHIP_VALUES}
             selectedValue={amount}
             onSelect={handleChipSelectAndClose}
-            formatValue={val => `${val} ${getCurrencyDisplayCode(currency)}`}
+            formatValue={(val: number) => `${val} ${getCurrencyDisplayCode(currency)}`}
+            inputComponent={<StakeInputDesktop onClose={closePopover} is_open={is_open} />}
         />
-    ) : (
-        <StakeInputDesktop onClose={closePopover} is_open={is_open} />
     );
 };
 
