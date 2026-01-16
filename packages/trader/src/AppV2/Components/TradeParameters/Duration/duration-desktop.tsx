@@ -170,15 +170,19 @@ const DurationPopoverContent: React.FC<{
 
     const config = getDurationConfig();
 
+    const hasOnlyOneUnit = availableUnits.length === 1;
+
     return (
-        <div className='duration-popover__layout'>
-            <div className='duration-popover__sidebar'>
-                <DurationUnitSelector
-                    selectedUnit={selectedUnit}
-                    onSelectUnit={onUnitSelect}
-                    availableUnits={availableUnits}
-                />
-            </div>
+        <div className={`duration-popover__layout ${hasOnlyOneUnit ? 'duration-popover__layout--single-unit' : ''}`}>
+            {!hasOnlyOneUnit && (
+                <div className='duration-popover__sidebar'>
+                    <DurationUnitSelector
+                        selectedUnit={selectedUnit}
+                        onSelectUnit={onUnitSelect}
+                        availableUnits={availableUnits}
+                    />
+                </div>
+            )}
             <div className='duration-popover__main'>
                 {config && (
                     <div className='duration-popover__header'>
@@ -227,6 +231,11 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
         }
         return units;
     }, [duration_units_list]);
+
+    const popoverWidth = React.useMemo(() => {
+        // Use narrower width for single-unit contracts (like digit contracts)
+        return availableUnits.length === 1 ? 280 : 360;
+    }, [availableUnits]);
 
     const [selectedUnit, setSelectedUnit] = useState('t'); // Default to Ticks
     const [selectedDuration, setSelectedDuration] = useState(duration);
@@ -386,7 +395,7 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
 
     return (
         <TradeParameterPopover
-            popoverWidth={360}
+            popoverWidth={popoverWidth}
             label={<Localize i18n_default_text='Duration' key={`duration${is_minimized ? '-minimized' : ''}`} />}
             is_minimized={is_minimized}
             disabled={is_market_closed}
