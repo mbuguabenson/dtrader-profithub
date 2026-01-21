@@ -14,6 +14,7 @@ import OnboardingGuide from 'AppV2/Components/OnboardingGuide/GuideForPages';
 import PurchaseButton from 'AppV2/Components/PurchaseButton';
 import TradeErrorSnackbar from 'AppV2/Components/TradeErrorSnackbar';
 import { TradeParameters } from 'AppV2/Components/TradeParameters';
+import TradeParamsFooter from 'AppV2/Components/TradeParamsFooter';
 // Commented out to use chart's native market selector instead
 // import MarketSelector from 'AppV2/Components/MarketSelector';
 import useContractsFor from 'AppV2/Hooks/useContractsFor';
@@ -140,6 +141,7 @@ const TradeDesktop = observer(() => {
                             <Guide show_guide_for_selected_contract />
                             <TradeParameters />
                             {!is_market_closed && <PurchaseButton />}
+                            <TradeParamsFooter />
                         </div>
                     </div>
                     {!guide_dtrader_v2?.trade_page && is_logged_in && <OnboardingGuide type='trade_page' />}
