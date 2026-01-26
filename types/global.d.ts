@@ -29,7 +29,6 @@ declare global {
     }
     interface DerivAppChannel {
         postMessage: (message: string) => void;
-        isReady?: () => boolean;
     }
     interface IntercomConfig {
         token: string | null;

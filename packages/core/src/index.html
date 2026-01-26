@@ -67,9 +67,16 @@
             }
 
             if (is_dark_theme) {
+                // Add dark class to HTML element before React loads
+                document.documentElement.classList.add('dark');
+                document.documentElement.classList.remove('light');
                 // if dark theme, change the property colors for dark theme
                 document.documentElement.style.setProperty('--color-surface-primary', '#181c25');
                 document.documentElement.style.setProperty('--color-text-primary', '#fff');
+            } else {
+                // Add light class for light theme
+                document.documentElement.classList.add('light');
+                document.documentElement.classList.remove('dark');
             }
 
             // Hide web app loader when inside native mobile app to prevent double loaders

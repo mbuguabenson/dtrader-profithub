@@ -31,14 +31,10 @@ const App = ({ root_store }) => {
     const language = preferred_language ?? getInitialLanguage();
     const { isBridgeAvailable, sendBridgeEvent } = useMobileBridge();
 
-    // Send trading:ready event after first paint to ensure smooth loader transition
+    // Send trading:ready event to ensure smooth loader transition
     React.useEffect(() => {
         if (isBridgeAvailable) {
-            // Use requestAnimationFrame to ensure React has painted the initial UI
-            // before telling native app to hide its loader
-            requestAnimationFrame(() => {
-                sendBridgeEvent('trading:ready');
-            });
+            sendBridgeEvent('trading:ready');
         }
     }, [isBridgeAvailable, sendBridgeEvent]);
 
