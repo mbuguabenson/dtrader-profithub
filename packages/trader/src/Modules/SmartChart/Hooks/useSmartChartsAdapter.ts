@@ -190,7 +190,7 @@ export const useSmartChartsAdapter = (config: UseSmartChartsAdapterConfig = {}):
             });
 
             // Transform adapter result to SmartCharts Champion format
-            if (params.granularity === 0) {
+            if (validatedGranularity === 0) {
                 // For ticks, return history format
                 return {
                     history: {
