@@ -172,6 +172,8 @@ jobs:
             ### 3. Generate End-User QA Checklist
 
             **Requirements:**
+            - **Be concise:** Focus only on critical tests. Aim for 15-20 test items maximum.
+            - **Group aggressively:** Combine related tests into single items with brief sub-points.
             - Create practical testing scenarios for QA testers (not developers)
             - Focus on **user-visible behavior**, not code implementation
             - Group related tests with sub-bullets
@@ -238,6 +240,8 @@ jobs:
               - Do screen readers work (if critical)?
 
             ### 4. Output Format
+
+            **Keep it focused:** Skip sections not relevant to the changes.
 
             Post a PR comment with this format:
 
