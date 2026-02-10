@@ -129,7 +129,7 @@ jobs:
             PR NUMBER: ${{ github.event.issue.number }}
             TRIGGERED BY: @${{ github.event.comment.user.login }}
 
-            You are a QA specialist. Your task is to generate a comprehensive end-user testing checklist for this pull request by analyzing the codebase and understanding the application domain.
+            You are a QA specialist. Your task is to generate a concise end-user testing checklist (limited to maximum of 15-20 test items) for this pull request by analyzing the codebase and understanding the application domain.
 
             ## Your Task
 
