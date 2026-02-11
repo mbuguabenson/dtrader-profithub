@@ -423,10 +423,6 @@ const StakeInput = observer(({ onClose, is_open }: TStakeInput) => {
             if (!isSaveDisabled) {
                 onSave();
             }
-            return;
-        }
-        if (e.key.length === 1 && !/[\d.,]/.test(e.key)) {
-            e.preventDefault();
         }
     };
 
@@ -443,6 +439,10 @@ const StakeInput = observer(({ onClose, is_open }: TStakeInput) => {
                 placeholder={localize('Amount')}
                 variant='fill'
                 inputMode='decimal'
+                customType='commaRemoval'
+                allowDecimals
+                decimals={decimals}
+                regex={/[^0-9.,]/g}
                 maxLength={state.max_length}
                 message={fe_stake_error || (should_show_stake_error && stake_error) || getInputMessage()}
                 status={fe_stake_error || (should_show_stake_error && stake_error) ? 'error' : 'neutral'}

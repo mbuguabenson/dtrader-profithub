@@ -207,10 +207,6 @@ const TakeProfitInputDesktop = observer(({ onClose, is_open }: TTakeProfitInputD
             if (!isSaveDisabled) {
                 onSave();
             }
-            return;
-        }
-        if (e.key.length === 1 && !/[\d.,]/.test(e.key)) {
-            e.preventDefault();
         }
     };
 
@@ -256,6 +252,10 @@ const TakeProfitInputDesktop = observer(({ onClose, is_open }: TTakeProfitInputD
                     placeholder={localize('Amount')}
                     variant='fill'
                     inputMode='decimal'
+                    customType='commaRemoval'
+                    allowDecimals
+                    decimals={decimals}
+                    regex={/[^0-9.,]/g}
                     maxLength={state.max_length}
                     message={state.fe_error_text || state.error_text || getInputMessage()}
                     status={state.fe_error_text || state.error_text ? 'error' : 'neutral'}

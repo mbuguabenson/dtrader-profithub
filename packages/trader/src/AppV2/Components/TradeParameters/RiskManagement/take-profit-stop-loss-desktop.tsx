@@ -232,12 +232,6 @@ const TakeProfitStopLossDesktop = observer(({ onClose, is_open }: TTakeProfitSto
         }));
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key.length === 1 && !/[\d.,]/.test(e.key)) {
-            e.preventDefault();
-        }
-    };
-
     const onBeforeInputChange = (field: 'tp' | 'sl') => (e: React.FormEvent<HTMLInputElement>) => {
         if (
             ['.', ','].includes((e.nativeEvent as InputEvent)?.data ?? '') &&
@@ -348,10 +342,13 @@ const TakeProfitStopLossDesktop = observer(({ onClose, is_open }: TTakeProfitSto
                         value={tp_state.input_value}
                         onChange={onTpInputChange}
                         onBeforeInput={onBeforeInputChange('tp')}
-                        onKeyDown={handleKeyDown}
                         placeholder={localize('Amount')}
                         variant='fill'
                         inputMode='decimal'
+                        customType='commaRemoval'
+                        allowDecimals
+                        decimals={decimals}
+                        regex={/[^0-9.,]/g}
                         maxLength={tp_state.max_length}
                         message={tp_state.fe_error_text || tp_state.error_text || getInputMessage(tp_state)}
                         status={tp_state.fe_error_text || tp_state.error_text ? 'error' : 'neutral'}
@@ -390,10 +387,13 @@ const TakeProfitStopLossDesktop = observer(({ onClose, is_open }: TTakeProfitSto
                         value={sl_state.input_value}
                         onChange={onSlInputChange}
                         onBeforeInput={onBeforeInputChange('sl')}
-                        onKeyDown={handleKeyDown}
                         placeholder={localize('Amount')}
                         variant='fill'
                         inputMode='decimal'
+                        customType='commaRemoval'
+                        allowDecimals
+                        decimals={decimals}
+                        regex={/[^0-9.,]/g}
                         maxLength={sl_state.max_length}
                         message={sl_state.fe_error_text || sl_state.error_text || getInputMessage(sl_state)}
                         status={sl_state.fe_error_text || sl_state.error_text ? 'error' : 'neutral'}
