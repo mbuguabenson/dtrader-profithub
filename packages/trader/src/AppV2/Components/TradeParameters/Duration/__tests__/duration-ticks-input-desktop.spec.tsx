@@ -8,6 +8,10 @@ import { useTraderStore } from 'Stores/useTraderStores';
 import DurationTicksInputDesktop from '../duration-ticks-input-desktop';
 
 jest.mock('Stores/useTraderStores');
+jest.mock('@deriv/shared', () => ({
+    ...jest.requireActual('@deriv/shared'),
+    getDurationMinMaxValues: jest.fn(),
+}));
 jest.mock('@deriv-com/translations', () => ({
     Localize: ({ i18n_default_text, values }: any) => {
         if (values) {
@@ -41,12 +45,17 @@ describe('DurationTicksInputDesktop', () => {
         onClose: mockOnClose,
     };
 
+    const mockGetDurationMinMaxValues = jest.requireMock('@deriv/shared').getDurationMinMaxValues;
+
     beforeEach(() => {
         jest.clearAllMocks();
+        mockGetDurationMinMaxValues.mockReturnValue([1, 10]);
         (useTraderStore as jest.Mock).mockReturnValue({
             duration: 5,
             duration_unit: 't',
             onChangeMultiple: mockOnChangeMultiple,
+            duration_min_max: { tick: { min: 1, max: 10 } },
+            contract_expiry_type: 'tick',
         });
     });
 
@@ -69,6 +78,8 @@ describe('DurationTicksInputDesktop', () => {
             duration: 60,
             duration_unit: 'm',
             onChangeMultiple: mockOnChangeMultiple,
+            duration_min_max: { tick: { min: 1, max: 10 } },
+            contract_expiry_type: 'tick',
         });
 
         render(<DurationTicksInputDesktop {...defaultProps} />);
@@ -389,6 +400,44 @@ describe('DurationTicksInputDesktop', () => {
 
             const saveButton = screen.getByRole('button', { name: /save/i });
             expect(saveButton).toBeDisabled();
+        });
+    });
+
+    describe('Backend min/max values', () => {
+        it('uses backend min/max when available (e.g., min=5, max=10)', async () => {
+            mockGetDurationMinMaxValues.mockReturnValue([5, 10]);
+            (useTraderStore as jest.Mock).mockReturnValue({
+                duration: 5,
+                duration_unit: 't',
+                onChangeMultiple: mockOnChangeMultiple,
+                duration_min_max: { tick: { min: 5, max: 10 } },
+                contract_expiry_type: 'tick',
+            });
+
+            render(<DurationTicksInputDesktop {...defaultProps} />);
+
+            expect(screen.getByText('Range: 5 - 10 ticks')).toBeInTheDocument();
+
+            const input = screen.getByRole('textbox');
+            await userEvent.clear(input);
+            await userEvent.type(input, '3');
+
+            expect(screen.getByText('Please enter a duration between 5 to 10 ticks.')).toBeInTheDocument();
+        });
+
+        it('falls back to defaults when backend values are unavailable', () => {
+            mockGetDurationMinMaxValues.mockReturnValue([]);
+            (useTraderStore as jest.Mock).mockReturnValue({
+                duration: 5,
+                duration_unit: 't',
+                onChangeMultiple: mockOnChangeMultiple,
+                duration_min_max: {},
+                contract_expiry_type: 'tick',
+            });
+
+            render(<DurationTicksInputDesktop {...defaultProps} />);
+
+            expect(screen.getByText('Range: 1 - 10 ticks')).toBeInTheDocument();
         });
     });
 });

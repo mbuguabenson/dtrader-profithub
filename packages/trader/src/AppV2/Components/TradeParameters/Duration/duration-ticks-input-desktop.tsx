@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
+import { getDurationMinMaxValues } from '@deriv/shared';
 import { Button, TextField } from '@deriv-com/quill-ui';
 import { Localize, useTranslations } from '@deriv-com/translations';
 
@@ -10,12 +11,17 @@ type TDurationTicksInputDesktopProps = {
     onClose: () => void;
 };
 
-const MIN_TICKS = 1;
-const MAX_TICKS = 10;
+const FALLBACK_MIN_TICKS = 1;
+const FALLBACK_MAX_TICKS = 10;
 
 const DurationTicksInputDesktop: React.FC<TDurationTicksInputDesktopProps> = observer(({ onClose }) => {
     const { localize } = useTranslations();
-    const { duration, duration_unit, onChangeMultiple } = useTraderStore();
+    const { duration, duration_unit, onChangeMultiple, duration_min_max, contract_expiry_type } = useTraderStore();
+
+    // Get dynamic min/max from backend, fallback to hardcoded values if unavailable
+    const [backendMin, backendMax] = getDurationMinMaxValues(duration_min_max, contract_expiry_type, 't');
+    const min = backendMin ?? FALLBACK_MIN_TICKS;
+    const max = backendMax ?? FALLBACK_MAX_TICKS;
 
     const [inputValue, setInputValue] = useState<string>(duration_unit === 't' ? String(duration) : '');
     const [error, setError] = useState<string>('');
@@ -33,11 +39,11 @@ const DurationTicksInputDesktop: React.FC<TDurationTicksInputDesktopProps> = obs
                 return false;
             }
 
-            if (numValue < MIN_TICKS || numValue > MAX_TICKS) {
+            if (numValue < min || numValue > max) {
                 setError(
                     localize('Please enter a duration between {{min}} to {{max}} ticks.', {
-                        min: MIN_TICKS,
-                        max: MAX_TICKS,
+                        min,
+                        max,
                     })
                 );
                 return false;
@@ -46,7 +52,7 @@ const DurationTicksInputDesktop: React.FC<TDurationTicksInputDesktopProps> = obs
             setError('');
             return true;
         },
-        [localize]
+        [localize, min, max]
     );
 
     const handleInputChange = useCallback(
@@ -96,8 +102,8 @@ const DurationTicksInputDesktop: React.FC<TDurationTicksInputDesktopProps> = obs
             <Localize
                 i18n_default_text='Range: {{min}} - {{max}} ticks'
                 values={{
-                    min: MIN_TICKS,
-                    max: MAX_TICKS,
+                    min,
+                    max,
                 }}
             />
         );
