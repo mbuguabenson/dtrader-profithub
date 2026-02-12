@@ -124,6 +124,12 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
         return (!!start_date || is_selected_date_today) && has_intraday_duration_unit;
     }, [duration_units_list, selectedDate, start_date, isToday]);
 
+    // Disable date selection for contracts that don't support daily duration (e.g. Daily Resets)
+    // Mirrors mobile logic in day.tsx line 221
+    const is_date_disabled = useMemo(() => {
+        return duration_units_list.filter(item => item.value === 'd').length === 0;
+    }, [duration_units_list]);
+
     // Calculate the display time (what to show in the field)
     const displayTime = useMemo(() => {
         return selectedTime;
@@ -188,8 +194,10 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
 
     // Date picker handlers
     const handleDateClick = useCallback(() => {
-        setIsDatePickerOpen(true);
-    }, []);
+        if (!is_date_disabled) {
+            setIsDatePickerOpen(true);
+        }
+    }, [is_date_disabled]);
 
     const handleDateChange = useCallback(
         (value: Date | Date[] | null | [Date | null, Date | null]) => {
@@ -304,6 +312,7 @@ const DurationEndTimeDesktop: React.FC<DurationEndTimeDesktopProps> = observer((
                     variant='fill'
                     status='neutral'
                     noStatusIcon
+                    disabled={is_date_disabled}
                     data-testid='dt_duration_end_date_input'
                 />
             </div>

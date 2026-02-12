@@ -1488,8 +1488,8 @@ export default class TradeStore extends BaseStore {
             if (symbol_to_check && symbol_to_check.trim() !== '') {
                 this.setMarketStatus(isMarketClosed(this.active_symbols, symbol_to_check));
 
-                // Handle trade parameters reset when switching between symbols with different support (V2 only)
-                if (this.is_dtrader_v2 && this.symbol && this.symbol !== symbol_to_check) {
+                // Handle trade parameters reset when switching between symbols with different duration/barrier support
+                if (this.symbol && this.symbol !== symbol_to_check) {
                     const trade_params_reset_values = this.handleTradeParamsResetOnSymbolChange(
                         this.symbol,
                         symbol_to_check
@@ -2452,7 +2452,7 @@ export default class TradeStore extends BaseStore {
 
     /**
      * Handles trade parameters reset when switching between symbols with different support
-     * This includes both barrier and duration resets for V2 only
+     * This includes both barrier and duration resets for all platforms (desktop and mobile)
      * @param old_symbol - The previous symbol
      * @param new_symbol - The new symbol being switched to
      * @returns Object with trade parameters to reset, or null if no reset needed
