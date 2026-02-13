@@ -9,4 +9,18 @@
     &__label {
         border-bottom: 1px dotted currentcolor;
     }
+
+    &__definition {
+        &__wrapper {
+            padding: var(--component-actionSheet-spacing-padding-lg);
+        }
+
+        &__title {
+            margin-block-end: var(--component-actionSheet-spacing-padding-lg);
+        }
+    }
+
+    &__button {
+        padding: var(--component-actionSheet-spacing-padding-lg);
+    }
 }

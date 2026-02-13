@@ -4,6 +4,7 @@ $TABS_HEIGHT: var(--core-size-2400);
     height: 100%;
     background-color: var(--semantic-color-slate-solid-surface-frame-mid);
     position: relative;
+    padding-bottom: var(--core-spacing-2800);
 
     .tab-list--container {
         display: block;
@@ -16,6 +17,35 @@ $TABS_HEIGHT: var(--core-size-2400);
             padding: 1.05rem 0;
         }
     }
+    &__filter {
+        &__wrapper {
+            padding: var(--core-spacing-400);
+            display: flex;
+            gap: var(--core-spacing-400);
+            overflow-x: auto;
+            min-height: var(--core-spacing-2400);
+            white-space: nowrap;
+
+            -ms-overflow-style: none; /* Internet Explorer 10+ */
+            scrollbar-width: none; /* Firefox */
+
+            &::-webkit-scrollbar {
+                display: none; /* Safari and Chrome */
+            }
+
+            .quill-chip {
+                display: inline-flex;
+            }
+        }
+    }
+    .initial-loader {
+        height: 100%;
+    }
+}
+
+.positions-page-container {
+    height: 100%;
+
     &__tabs {
         height: 100%;
 
@@ -55,30 +85,6 @@ $TABS_HEIGHT: var(--core-size-2400);
                 }
             }
         }
-    }
-    &__filter {
-        &__wrapper {
-            padding: var(--core-spacing-400);
-            display: flex;
-            gap: var(--core-spacing-400);
-            overflow-x: auto;
-            min-height: var(--core-spacing-2400);
-            white-space: nowrap;
-
-            -ms-overflow-style: none; /* Internet Explorer 10+ */
-            scrollbar-width: none; /* Firefox */
-
-            &::-webkit-scrollbar {
-                display: none; /* Safari and Chrome */
-            }
-
-            .quill-chip {
-                display: inline-flex;
-            }
-        }
-    }
-    .initial-loader {
-        height: 100%;
     }
 }
 
