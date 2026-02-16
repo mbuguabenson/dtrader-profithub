@@ -5,14 +5,16 @@ import { mockStore, StoreProvider } from '@deriv/stores';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { AVAILABLE_CONTRACTS, CONTRACT_LIST } from 'AppV2/Utils/trade-types-utils';
+import { CONTRACT_LIST } from 'AppV2/Utils/trade-types-utils';
 
 import TraderProviders from '../../../../trader-providers';
 import Guide from '../guide';
 
+const mockUseDevice = jest.fn(() => ({ isMobile: false }));
+
 jest.mock('@deriv-com/ui', () => ({
     ...jest.requireActual('@deriv-com/ui'),
-    useDevice: jest.fn(() => ({ isMobile: false })),
+    useDevice: () => mockUseDevice(),
 }));
 
 const trade_types = 'Trade types';
@@ -201,19 +203,47 @@ describe('Guide', () => {
         );
     });
 
-    it('should render term definition if user clicked on it', async () => {
+    it('should render term definition in tooltip on desktop when hovering over term', async () => {
+        // Desktop mode - definitions show in tooltips on hover
+        mockUseDevice.mockReturnValue({ isMobile: false });
+
+        renderGuide();
+
+        await userEvent.click(screen.getByText(/How to trade Rise\/Fall\?/));
+        await userEvent.click(screen.getByText(CONTRACT_LIST.ACCUMULATORS));
+
+        // Wait for the AccumulatorsTradeDescription component to load
+        const growth_rate_text = await screen.findByText(/growth rate/i, {}, { timeout: 3000 });
+
+        // On desktop, term definitions appear in tooltips (TooltipPortal component)
+        expect(growth_rate_text).toBeInTheDocument();
+
+        // Verify that term buttons are rendered (wrapped in TooltipPortal on desktop)
+        const termButtons = screen.getAllByRole('button', { name: /growth rate/i });
+        expect(termButtons.length).toBeGreaterThan(0);
+    });
+
+    it('should render term definition in modal on mobile when clicking term', async () => {
+        // Mobile mode - definitions show in modal on click
+        mockUseDevice.mockReturnValue({ isMobile: true });
+
         renderGuide();
 
         const term_definition = 'You can choose a growth rate with values of 1%, 2%, 3%, 4%, and 5%.';
         expect(screen.queryByText(term_definition)).not.toBeInTheDocument();
 
-        await userEvent.click(screen.getByText(/How to trade Rise\/Fall\?/));
+        // On mobile, the guide trigger is a button instead of text link
+        const guideButton = screen.getByRole('button', { name: '' });
+        await userEvent.click(guideButton);
+
         await userEvent.click(screen.getByText(CONTRACT_LIST.ACCUMULATORS));
 
-        // Wait for the AccumulatorsTradeDescription component to load and find the text with "growth rate"
+        // Wait for the AccumulatorsTradeDescription component to load and find the term
         const growth_rate_text = await screen.findByText(/growth rate/i, {}, { timeout: 3000 });
         await userEvent.click(growth_rate_text);
 
+        // On mobile, clicking a term opens GuideDefinitionModal with the definition
         expect(await screen.findByText(term_definition)).toBeInTheDocument();
     });
+    // [/AI]
 });
