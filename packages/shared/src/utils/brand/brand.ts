@@ -6,7 +6,8 @@ import { appendLangParam } from '../url/helpers';
  * Checks if the current environment should be treated as production.
  * Returns true if NODE_ENV is 'production' OR if the runtime hostname is the beta platform.
  */
-const isProductionEnvironment = (): boolean => {
+// [AI]
+export const isProductionEnvironment = (): boolean => {
     if (process.env.NODE_ENV === 'production') return true;
     if (typeof window !== 'undefined') {
         return window.location.hostname === config_data.platform.hostname.beta;

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Button, Checkbox, Input } from '@deriv/components';
-import { getDebugServiceWorker, getSocketURL } from '@deriv/shared';
-import { observer, useStore } from '@deriv/stores';
 import { useFormik } from 'formik';
+
+import { Button, Checkbox, Input } from '@deriv/components';
+import { getDebugServiceWorker, getSocketURL, isProductionEnvironment } from '@deriv/shared';
+import { observer, useStore } from '@deriv/stores';
+
 import './Devtools.scss';
 
 const EndpointSection = observer(() => {
@@ -118,8 +120,9 @@ const Devtools = observer(() => {
     );
 });
 
-// @ts-expect-error Here we check if the code is running on the production environment,
-// we will return a null component instead of the actual devtools component. Hence the TS error is expected.
-const ProductionSafeDevtools: typeof Devtools = process.env.NODE_ENV !== 'development' ? () => null : Devtools;
+const ProductionSafeDevtools = observer(() => {
+    if (process.env.NODE_ENV !== 'development' || isProductionEnvironment()) return null;
+    return <Devtools />;
+});
 
 export default ProductionSafeDevtools;
