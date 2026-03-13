@@ -59,21 +59,6 @@ export const redirectToLogin = async (_language?: string): Promise<void> => {
     });
 
     const auth_url = `${getAuthBaseUrl()}/oauth2/auth?${params}`;
-
-    // Remove this block once the invalid_client error is resolved.
-    // eslint-disable-next-line no-console
-    console.group('[redirectToLogin] OAuth2 redirect (step 4)');
-    // eslint-disable-next-line no-console
-    console.log('Full URL:', auth_url);
-    // eslint-disable-next-line no-console
-    console.log('client_id:', getOAuthClientId());
-    // eslint-disable-next-line no-console
-    console.log('redirect_uri:', getOAuthRedirectUri());
-    // eslint-disable-next-line no-console
-    console.log('auth_base_url:', getAuthBaseUrl());
-    // eslint-disable-next-line no-console
-    console.groupEnd();
-
     window.location.replace(auth_url);
 };
 

@@ -37,11 +37,11 @@ const apiFetch = async (url: string, options: RequestInit = {}): Promise<Respons
     return res;
 };
 
-/** GET /trading/v1/options/accounts */
+/** GET /trading/v1/derivatives/accounts */
 export const fetchAccounts = async (): Promise<TAccount[]> => {
-    const res = await apiFetch(`${getApiV4BaseUrl()}/trading/v1/options/accounts`);
+    const res = await apiFetch(`${getApiV4BaseUrl()}/trading/v1/derivatives/accounts`);
     if (!res.ok) throw new Error(`fetchAccounts failed: ${res.status}`);
-    return (await res.json()).data;
+    return (await res.json()).data.data;
 };
 
 /** POST /trading/v1/options/accounts */
@@ -66,10 +66,16 @@ export const createAccount = async (params: {
 export const fetchOTP = async (account_id: string): Promise<string> => {
     const res = await apiFetch(`${getApiV4BaseUrl()}/trading/v1/options/accounts/${account_id}/otp`, {
         method: 'POST',
+        body: JSON.stringify({}),
     });
     if (!res.ok) throw new Error(`fetchOTP failed: ${res.status}`);
-    const { data } = await res.json();
-    return data.url;
+    // Response is double-encoded: { data: '{"data":{"url":"wss://..."}}' }
+    // Guard: if the API starts returning the inner object directly, handle both shapes.
+    const outer = await res.json();
+    const inner = typeof outer.data === 'string' ? JSON.parse(outer.data) : outer.data;
+    const url = inner?.data?.url;
+    if (!url) throw new Error('fetchOTP: no url in response');
+    return url;
 };
 
 /** POST /trading/v1/options/accounts/{id}/reset-demo-balance */

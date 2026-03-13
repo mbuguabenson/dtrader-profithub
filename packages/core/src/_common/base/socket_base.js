@@ -1,5 +1,5 @@
 const DerivAPIBasic = require('@deriv/deriv-api/dist/DerivAPIBasic');
-const { getAccountType, cloneObject, State } = require('@deriv/shared');
+const { getAccountType, cloneObject, State, getApiV4BaseUrl } = require('@deriv/shared');
 const SocketCache = require('./socket_cache');
 const APIMiddleware = require('./api_middleware');
 
@@ -19,8 +19,12 @@ const BinarySocketBase = (() => {
     let reconnect_attempt_count = 0; // Track number of reconnect attempts
 
     // v4: WS URL is set by client-store after fetching an OTP from the REST API.
-    // null means unauthenticated — fall back to public endpoint.
-    const V4_PUBLIC_WS = 'wss://api.derivws.com/trading/v1/options/ws/public';
+    // null means unauthenticated — fall back to public endpoint built from brand.config.json.
+    // Evaluated lazily (not at module load time) so window.location is available.
+    const getPublicWSUrl = () => {
+        const base = getApiV4BaseUrl(); // e.g. "https://api.derivws.com"
+        return `${base.replace(/^https?:\/\//, 'wss://')}/trading/v1/options/ws/public`;
+    };
     let configured_ws_url = null;
 
     const setWSUrl = url => {
@@ -39,7 +43,7 @@ const BinarySocketBase = (() => {
         if (is_mock_server) {
             return 'ws://127.0.0.1:42069';
         }
-        return configured_ws_url ?? V4_PUBLIC_WS;
+        return configured_ws_url ?? getPublicWSUrl();
     };
 
     const isReady = () => hasReadyState(1);
@@ -49,12 +53,14 @@ const BinarySocketBase = (() => {
     const blockRequest = value => deriv_api?.blockRequest(value);
 
     const close = () => {
-        binary_socket.close();
+        if (binary_socket) binary_socket.close();
     };
 
     const closeAndOpenNewConnection = () => {
-        close();
-        is_switching_socket = true;
+        if (binary_socket) {
+            close();
+            is_switching_socket = true;
+        }
         openNewConnection();
     };
 
@@ -126,7 +132,7 @@ const BinarySocketBase = (() => {
 
             // v4: auth is embedded in the OTP WS URL — no separate authorize message.
             // Balance subscription serves as auth confirmation (handled in socket-general.js).
-            const is_authenticated = configured_ws_url && configured_ws_url !== V4_PUBLIC_WS;
+            const is_authenticated = configured_ws_url && configured_ws_url !== getPublicWSUrl();
 
             if (is_authenticated) {
                 // Only reset authorization state on initial connection, not on reconnection
@@ -513,6 +519,7 @@ const BinarySocketBase = (() => {
         changeEmail,
         setWSUrl,
         getWSUrl,
+        getPublicWSUrl,
     };
 })();
 
@@ -552,7 +559,7 @@ const proxyForAuthorize = obj =>
                 // In v4 the OTP URL embeds auth — balance confirms the session is live.
                 // Access configured_ws_url via the IIFE-exposed getter rather than direct closure reference.
                 const current_ws_url = BinarySocketBase.getWSUrl?.();
-                if (current_ws_url && current_ws_url !== 'wss://api.derivws.com/trading/v1/options/ws/public') {
+                if (current_ws_url && current_ws_url !== BinarySocketBase.getPublicWSUrl?.()) {
                     return BinarySocketBase?.wait('balance')?.then(() => target[field](...args));
                 }
                 // Not authenticated — execute without waiting

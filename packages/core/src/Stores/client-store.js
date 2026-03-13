@@ -425,17 +425,6 @@ export default class ClientStore extends BaseStore {
 
         this.setIsClientStoreInitialized();
 
-        // Ensure balance subscription is active
-        if (this.is_logged_in && this.loginid) {
-            setTimeout(() => {
-                import('../Services/socket-general').then(({ default: BinarySocketGeneral }) => {
-                    if (BinarySocketGeneral.ensureBalanceSubscription) {
-                        BinarySocketGeneral.ensureBalanceSubscription();
-                    }
-                });
-            }, 200);
-        }
-
         // Set up visibility change listener to check whoami when tab becomes visible
         this.setupVisibilityListener();
 
@@ -579,10 +568,9 @@ export default class ClientStore extends BaseStore {
     }
 
     /**
-     * Switch to a different account
-     * Handles notification clearing, localStorage updates, and WebSocket reconnection
+     * Switch to a different account.
+     * Updates loginid, fetches a fresh OTP, and reconnects the WebSocket.
      * @param {string} account_id - The account ID to switch to
-     * @param {'real' | 'demo'} account_type - The account type
      */
     async switchAccount(account_id) {
         if (!account_id || this.loginid === account_id) return;
@@ -590,6 +578,10 @@ export default class ClientStore extends BaseStore {
         // Track the newly active account for multi-tab sync
         localStorage.setItem('active_loginid', account_id);
         sessionStorage.setItem('active_loginid', account_id);
+
+        // Update the store's loginid immediately so components don't render stale data
+        // while waiting for the balance response to arrive.
+        this.setLoginId(account_id);
 
         // Clear notifications when switching accounts (similar to old implementation)
         this.root_store.notifications.removeNotifications(true);
@@ -599,7 +591,16 @@ export default class ClientStore extends BaseStore {
         // Clear contract markers to prevent showing previous account's contracts on chart
         this.root_store.contract_trade.clearContracts();
 
-        // Reconnect WebSocket with new account
+        // Fetch a fresh OTP for the new account — OTP URLs are single-use and
+        // embed the account ID, so reusing the old URL would connect to the wrong account.
+        try {
+            const ws_url = await fetchOTP(account_id);
+            BinarySocket.setWSUrl(ws_url);
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('[Auth] Failed to fetch OTP for account switch:', error);
+        }
+
         BinarySocket.closeAndOpenNewConnection();
     }
 }
