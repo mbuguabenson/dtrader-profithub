@@ -143,7 +143,7 @@ const Native = ({
                 />
             </div>
             {error && (
-                <Text size='xxs' styles={{ color: 'var(--brand-red-coral)' }} className='dc-datepicker__error'>
+                <Text size='xxs' styles={{ color: 'var(--brand-primary)' }} className='dc-datepicker__error'>
                     {error}
                 </Text>
             )}

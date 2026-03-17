@@ -104,6 +104,36 @@ if (fs.existsSync(manifestPath)) {
     }
 }
 
+// Favicons — warn if the default Deriv favicon is still present
+// We detect it by checking if favicon-32.png contains the Deriv "d" logo.
+// The default file is a small PNG; if replaced it will differ in size from the 897-byte default.
+const faviconPath = path.join(ROOT, 'packages', 'core', 'src', 'public', 'images', 'favicons', 'favicon-32.png');
+if (fs.existsSync(faviconPath)) {
+    const faviconSize = fs.statSync(faviconPath).size;
+    if (faviconSize === 1498) {
+        warnings.push(
+            'Favicon is still the default Deriv icon. Replace all files in packages/core/src/public/images/favicons/. See WHITE_LABEL.md → "Favicons"'
+        );
+    }
+}
+
+// Brand SVG logos — warn if they still contain the default "Deriv" text
+const brandLogoFiles = [
+    ['assets/brand/brand-logo.svg', config.brand_logo],
+    ['assets/brand/brand-logo-dark.svg', config.brand_logo_dark],
+].filter(([, configPath]) => configPath);
+for (const [relPath] of brandLogoFiles) {
+    const absPath = path.join(ROOT, relPath);
+    if (fs.existsSync(absPath)) {
+        const content = fs.readFileSync(absPath, 'utf8');
+        if (content.includes('>Deriv<')) {
+            warnings.push(
+                `${relPath} still contains the default "Deriv" brand text. Replace it with your own logo or brand name.`
+            );
+        }
+    }
+}
+
 // PWA icons — warn if default Deriv-named files are still present
 const pwaIconDir = path.join(ROOT, 'packages', 'core', 'src', 'public', 'images', 'common', 'logos', 'platform_logos');
 if (fs.existsSync(pwaIconDir)) {
