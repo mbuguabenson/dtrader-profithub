@@ -1,24 +1,29 @@
 {
     "version": 2,
-    "builds": [
-        {
-            "src": "package.json",
-            "use": "@vercel/static-build",
-            "config": {
-                "distDir": "packages/core/dist"
-            }
-        }
-    ],
+    "buildCommand": "npm run build:all",
+    "outputDirectory": "packages/core/dist",
+    "cleanUrls": true,
+    "trailingSlash": false,
     "routes": [
         {
+            "src": "^/js/(.*)$",
+            "dest": "/js/$1"
+        },
+        {
+            "src": "^/css/(.*)$",
+            "dest": "/css/$1"
+        },
+        {
+            "src": "^/assets/(.*)$",
+            "dest": "/assets/$1"
+        },
+        {
+            "src": "^/brand/(.*)$",
+            "dest": "/brand/$1"
+        },
+        {
             "src": "/(.*)",
-            "dest": "/packages/core/dist/$1"
+            "dest": "/index.html"
         }
-    ],
-    "outputDirectory": "packages/core/dist",
-    "functions": {
-        "packages/core/dist/**/*.js": {
-            "runtime": "nodejs20.x"
-        }
-    }
+    ]
 }
