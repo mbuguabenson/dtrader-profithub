@@ -1,7 +1,6 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
-        "ignoreDeprecations": "6.0",
         "paths": {
             "_common/*": ["./src/_common/*"],
             "Components/*": ["./src/Components/*"],
