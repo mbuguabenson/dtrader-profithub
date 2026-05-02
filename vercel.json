@@ -1,0 +1,24 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "packages/core/dist"
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/packages/core/dist/$1"
+        }
+    ],
+    "outputDirectory": "packages/core/dist",
+    "functions": {
+        "packages/core/dist/**/*.js": {
+            "runtime": "nodejs20.x"
+        }
+    }
+}

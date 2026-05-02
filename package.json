@@ -115,6 +115,7 @@
         "ts-jest": "^29.2.5"
     },
     "scripts": {
+        "build": "npm run build:all",
         "serve": "f () { npm exec --workspace=@deriv/${1:-'*'} -- npm run serve $npm_config_open;}; f",
         "bootstrap": "npm ci --strict-peer-deps --verbose",
         "bootstrap:ci": "npm ci --strict-peer-deps --verbose",
