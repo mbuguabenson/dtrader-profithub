@@ -1,6 +1,7 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
+        "ignoreDeprecations": "6.0",
         "paths": {
             "_common/*": ["src/_common/*"],
             "AppV2/*": ["src/AppV2/*"],
@@ -19,7 +20,6 @@
         },
         "useDefineForClassFields": true,
         "outDir": "./dist",
-        "baseUrl": "./",
         "types": ["jest", "@testing-library/jest-dom", "node"]
     },
     "include": [

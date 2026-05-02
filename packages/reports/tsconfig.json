@@ -1,6 +1,7 @@
 {
     "extends": "../../tsconfig.json",
     "compilerOptions": {
+        "ignoreDeprecations": "6.0",
         "paths": {
             "_common/*": ["./src/_common/*"],
             "Components/*": ["./src/Components/*"],
@@ -14,8 +15,7 @@
             "Types": ["./src/Types"],
             "@deriv/*": ["../*/src"]
         },
-        "outDir": "./dist",
-        "baseUrl": "./"
+        "outDir": "./dist"
     },
     "include": ["src"]
 }
