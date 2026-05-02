@@ -116,7 +116,7 @@
     },
     "scripts": {
         "build": "npm run build:all",
-        "serve": "f () { npm exec --workspace=@deriv/${1:-'*'} -- npm run serve $npm_config_open;}; f",
+        "serve": "npm exec --workspace=@deriv/%npm_config_workspace% -- npm run serve %npm_config_open%",
         "bootstrap": "npm ci --strict-peer-deps --verbose",
         "bootstrap:ci": "npm ci --strict-peer-deps --verbose",
         "bootstrap:dev": "npm install --strict-peer-deps --verbose",
