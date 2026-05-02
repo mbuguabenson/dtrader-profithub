@@ -6,7 +6,7 @@
     "private": true,
     "scripts": {
         "start": "npm run test && npm run serve",
-        "serve": "echo \"Serving...\" && ../../node_modules/.bin/webpack serve --config \"./build/webpack.config.js\" --env open %npm_config_open%",
+        "serve": "echo \"Serving...\" && webpack serve --config \"./build/webpack.config.js\" --env open %npm_config_open%",
         "build": "webpack --config \"./build/webpack.config.js\" --env base=%npm_config_base%",
         "test:eslint": "eslint \"./src/**/*.?(js|jsx|ts|tsx)\""
     },
